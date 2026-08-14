@@ -1,0 +1,50 @@
+# Brand Context — {{PROJECT_NAME}}
+
+_Owner/brand voice, aesthetic direction, preferences. Source of truth for
+anything visual or tonal — update as decisions solidify, but don't let this
+drift out of sync with what's actually implemented in `/src`._
+
+## Positioning
+
+{{Who is this business, and how do they want to be perceived? Not just
+"what they do" — the actual character. WePipe's example: "third-generation
+trade craftsmanship running on modern infrastructure... confidence
+without arrogance." Get something equally specific for this client, don't
+default to generic "professional and trustworthy."}}
+
+## Color Palette
+
+{{Fill in once decided — hex + role, e.g.:}}
+
+| Swatch | Hex | Role |
+|---|---|---|
+| | | |
+
+## Typography
+
+- **Display:**
+- **Body:**
+- **Utility/data face** (if applicable):
+
+## Layout Concept
+
+{{What's the hero going to look like? Any signature recurring element
+(WePipe's example: a "coupling divider" motif + isometric schematic
+hero)? Real businesses deserve a real visual idea, not a generic
+contractor-template look.}}
+
+## Motion
+
+{{Usually: restrained. One orchestrated moment, everything else quiet and
+functional — unless there's a real reason for more.}}
+
+## Trust Claim (verbatim, repeats on every page)
+
+_(not yet finalized — see `wiki/seo-strategy.md`)_
+
+---
+
+## Implementation Notes
+
+_(fill in once built: which components implement which parts of this
+brief, any gaps between the brief and what's actually live)_

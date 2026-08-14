@@ -1,0 +1,223 @@
+# CLAUDE.md — {{PROJECT_NAME}} Project Brain
+
+> Read this file first, every session. It defines who's allowed to do what,
+> how deploys work, where everything lives, and the standing checklists that
+> keep this project consistent across sessions and across people.
+>
+> This template is genericized from WePipe (2026-08), the first client run
+> through this whole process end-to-end — built, deployed, audited, and
+> fixed using real live data at every step. Keep what's proven here; adapt
+> what's specific to this client.
+
+---
+
+## 1. Project Overview
+
+**{{PROJECT_NAME}}** is a **[real / practice — resolve this explicitly,
+don't leave it ambiguous]** {{ONE_LINE_BUSINESS_DESCRIPTION}}. See
+`/wiki/brand-context.md` for the full aesthetic/voice brief.
+
+**Stack:** Astro (static-first) + Cloudflare Pages — the proven default;
+only deviate with a real reason.
+**Repo:** {{REPO_URL — or "[not yet created]"}}
+**Live domain:** {{DOMAIN — or "[TBD]"}}
+
+---
+
+## 2. Roles
+
+| Who | Owns |
+|---|---|
+| {{ROLE_1_NAME}} | {{e.g. Client strategy, content approval, outreach}} |
+| {{ROLE_2_NAME — if applicable}} | {{e.g. Data engineering, analytics, technical build}} |
+| Claude Code | Implementation — components, pages, scripts, content generation, QA |
+
+Nobody pushes directly to `main` without running the relevant QA script
+first (see Section 5). Claude Code should refuse to push/deploy on
+request if `npm run qa:preflight` hasn't been run this session — flag it
+and run it first.
+
+---
+
+## 3. Deploy Rules
+
+- Deploys happen via Cloudflare Pages, auto-triggered on push to `main`.
+- **Never push directly to `main`** for anything beyond a trivial copy fix.
+  Branch, PR, review, merge.
+- Before any deploy that includes new pages: run `npm run qa:preflight`
+  (local, fast) and, once pages are live in a preview, `npm run qa:wave`
+  (post-wave-qa.py) before promoting to production.
+- Before adding a **new service line** (not just new area pages for an
+  existing service), follow the phased rollout: one service page with
+  schema first → checkpoint on real analytics → then area pages, blog
+  cluster, directories, outreach. Do not roll out everything at once —
+  a pilot page published before there's any live traffic to check
+  against isn't actually a pilot, it's just an early page. (Confirmed the
+  hard way on WePipe — this isn't theoretical caution.)
+
+---
+
+## 4. Model & Tooling Choices
+
+- Default subagent model: **Sonnet**, unless a task is pure exploration
+  (use `haiku`) or genuinely complex synthesis (use `opus`).
+- Content-generation subagents (area page fan-out) run in **waves of 10**
+  with a shared timeout, not one at a time and not all at once.
+- A Python merge script — not an AI agent — applies content-bar hard
+  gates after a fan-out wave.
+
+---
+
+## 5. Where Everything Lives
+
+```
+/scripts/              preflight.py, post-wave-qa.py, site-coverage-index.py
+/wiki/                 living reference docs — see map below
+/wiki/inbox/           drop zone for raw notes/screenshots — process on request
+/src/data/             per-town, per-service JSON data files (see schema below)
+/src/pages/             route files
+/src/components/       reusable Astro components (extracted once patterns repeat)
+SESSION-LOG.md         append-only dated log — never overwritten
+lessons.json           mechanical lessons brain — see Section 8
+```
+
+**Sales/prospect audit tooling lives elsewhere, on purpose.** `audit.py`
+(scores any live site) and `remediate.py` (generates fixes from an audit)
+are client-agnostic — they belong in the shared `seo-audit-toolkit` repo,
+not here, even if a fresh copy gets used while working on this client.
+`preflight.py` and `post-wave-qa.py` DO belong here — they check *this*
+project's own files.
+
+### Wiki map
+
+| File | Purpose |
+|---|---|
+| `wiki/active-priorities.md` | What's next, updated every session |
+| `wiki/analytics-insights.md` | Every data pull, dated |
+| `wiki/seo-strategy.md` | What's proven to work for this client |
+| `wiki/page-inventory.md` | Every page, its slug, its status |
+| `wiki/brand-context.md` | Owner/brand voice, aesthetic direction, preferences |
+| `wiki/inbox/` | Zero-friction drop zone — process on the "process the inbox" trigger |
+
+Each wiki page stays short and gets pruned to stay current — this is a
+living reference, not an archive. Long-term history belongs in
+`SESSION-LOG.md`, not the wiki.
+
+---
+
+## 6. Session Triggers
+
+These are named, listed procedures — not something to remember. Run them
+by name.
+
+### "Starting new session"
+1. Pull the latest code
+2. Run `npm run qa:preflight` (catches file-level corruption before you build on it)
+3. Refresh analytics if a connector is available (GA4 / GSC)
+4. Check `wiki/inbox/` for dropped notes
+5. Read `wiki/active-priorities.md`
+6. Run the **`briefing`** skill (`start` mode) before asking what to work
+   on — a spoken-style plain-language status update, not a file, not a
+   bullet dump of the wiki. See `~/.claude/skills/briefing/SKILL.md`.
+7. Then ask what to work on
+
+### "Process the inbox"
+Read every raw note/screenshot in `wiki/inbox/`. Extract the insight (a
+long note becomes two bullets). File it on the correct wiki page. Archive
+the source. Capture stays frictionless; organizing happens on demand, not
+automatically.
+
+### "End session" / "wrap up"
+1. Update `wiki/active-priorities.md`
+2. Append a dated entry to `SESSION-LOG.md` — what was done, deploy
+   status, what's next
+3. Run the **`briefing`** skill (`wrap-up` mode) — same tool as session
+   start, looking backward instead of forward. Don't just restate the
+   SESSION-LOG bullet list verbatim — this is for a human, not a machine.
+4. Push everything immediately, so the next session sees current state
+
+---
+
+## 7. Content & Data Standards
+
+### Town / service data file schema (if this client needs local-area pages)
+
+Every town data entry must include, at minimum:
+
+```json
+{
+  "slug": "example-town",
+  "name": "Example Town",
+  "county": "Example County",
+  "introDirectAnswer": "40-60 word answer-first paragraph",
+  "introParagraph1": "~1,500 chars — real neighborhoods, housing stock, 10+ named local entities",
+  "introParagraph2": "~1,500 chars — a first-hand practitioner voice + adjacent-town cross-link",
+  "faqs": [
+    { "q": "How much does [service] cost in [town]?", "a": "..." },
+    { "q": "How long does [service] take?", "a": "..." },
+    { "q": "What does [service] cover?", "a": "..." },
+    { "q": "Who performs the work?", "a": "..." }
+  ],
+  "nearbyAreas": ["adjacent-town-1", "adjacent-town-2"]
+}
+```
+
+**Hard rules:**
+- Minimum 4 evergreen FAQs (cost / scope / timing / who-performs) at
+  fixed positions, then 4–8 town-specific
+- 15+ named local entities in the main narrative — regenerate if under 10
+- Below ~750 characters of unique narrative per page = doorway-page risk.
+  Reject.
+- Exact-match verbatim phrase for the trust claim ({{define this client's
+  version once finalized}}) — this is the one string allowed to repeat
+  identically across every page. Everything else must be genuinely
+  different per town.
+
+### Every town slug must exist in all parallel data files.
+Run `site-coverage-index.py` before proposing new pages to confirm no
+duplicate pages or duplicate content under varied slugs.
+
+---
+
+## 8. Lessons Brain
+
+`lessons.json` is the single source of truth for every mistake-turned-rule
+**for this specific client**. When a bug is fixed or something new is
+learned, ask: *"should this go in the brain?"* Most rules become a
+declarative check (no code needed); genuine judgment calls stay as prose
+context.
+
+Format:
+```json
+{
+  "lessons": []
+}
+```
+
+At session start, print a compact index of lessons into context. When
+editing a file with a known risk, surface the relevant lesson inline.
+
+---
+
+## 9. Communication Norms
+
+These carried over from WePipe unchanged — they're not client-specific,
+they're just correct:
+
+- No fake testimonials, ever.
+- Definitive language in answer capsules — never "might typically" or
+  hedged phrasing.
+- Tag claims by evidence tier where relevant: STRONG / PLAUSIBLE / MYTH.
+- Never fabricate NAP data, credentials, or business specifics that
+  aren't confirmed — mark unknowns `[TBD]` and flag them back rather
+  than guessing.
+- When a client (or {{primary contact}}) requests a change that breaks
+  an SEO rule: acknowledge the ask → cite the rule and why it exists →
+  explain the tradeoff plainly → offer an alternative if one exists →
+  respect their final call, but make sure the tradeoff was stated
+  explicitly.
+
+---
+
+*Last updated: {{DATE}}. Update this file as the project's real rules
+solidify — it should never go stale.*

@@ -1,0 +1,18 @@
+# Analytics Insights
+
+_Every data pull, dated. GA4 / GSC connector output goes here once wired up._
+
+## Data Sources
+
+- GA4: not yet connected
+- GSC: not yet connected
+
+## Baseline
+
+Not yet established — set this the moment the site goes live: Users,
+Sessions, traffic mix (organic vs. direct), device split. This baseline
+is what every future improvement gets measured against.
+
+## Insights Log
+
+<!-- Newest entries at top. Format: ### YYYY-MM-DD — short title -->

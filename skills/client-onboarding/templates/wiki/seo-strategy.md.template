@@ -1,0 +1,58 @@
+# SEO Strategy
+
+_What's proven to work for this client. Keep this to what's actually
+validated by data — hypotheses belong in active-priorities.md until proven._
+
+## Business Type
+
+{{Is this a service-area business (travels to customers, no single
+storefront) or a fixed-location business? This changes the whole
+strategy:}}
+- Service-area: proximity to searcher is fixed and can't be controlled —
+  relevance and prominence CAN be built, that's where the work goes. Must
+  win far-town visibility through the website itself, since the map pack
+  naturally favors towns near the home base.
+- Fixed-location: proximity IS controllable somewhat (the address itself),
+  different playbook.
+
+## The Two Levers
+
+- **Organic (website)** — one page per service × area combination, each
+  genuinely unique, not thin
+- **Map pack (Google Business Profile)** — once a real GBP exists,
+  service area + categories must mirror the website's service pages
+  exactly
+
+## Search Intent → Page Type Mapping
+
+| Intent | Example | Page type |
+|---|---|---|
+| Informational | "how often should X be replaced" | Blog / FAQ post |
+| Commercial | "X cost [region]" | Service hub page |
+| Local-transactional | "emergency X [town]" | Area page |
+| Navigational | "{{business name}}" | Homepage |
+
+## Current Service × Area Matrix
+
+_(not yet built — list every service, list every area served, cross them
+to find every page that needs to exist)_
+
+## Proven
+
+-
+
+## Hypotheses / Testing
+
+-
+
+## Ruled Out
+
+-
+
+## Trust Claim (verbatim, repeats identically across pages)
+
+> [Define this client's version of a repeatable trust claim here once
+> finalized — e.g. "the same licensed tech who shows up to every
+> appointment... no rotating subcontractors." This is the ONE string
+> allowed to repeat identically across every page — everything else must
+> be genuinely different per page.]

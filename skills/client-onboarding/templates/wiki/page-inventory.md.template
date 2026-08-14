@@ -1,0 +1,15 @@
+# Page Inventory
+
+_Every page, its slug, its status. Update whenever a page is added, changed, or removed._
+
+| Slug | Type | Status | Notes |
+|---|---|---|---|
+
+## Town / Area Pages
+
+_None yet — see the phased rollout in CLAUDE.md Section 3 before adding.
+One pilot area page first, checked against real analytics, before
+scaling to more._
+
+| Slug | Service | Area | Status |
+|---|---|---|---|
