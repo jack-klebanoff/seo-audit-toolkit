@@ -7,8 +7,9 @@ A reusable, client-agnostic toolkit for two jobs:
    uses: cold-outreach sales ("here's exactly what's costing you leads")
    and ongoing QA on sites we've already built.
 2. **`remediate.py`** — takes an `audit.py` JSON report and generates
-   concrete, ready-to-paste fixes for whatever it can fix reliably (schema
-   and canonical tags so far — more finding types over time).
+   concrete, ready-to-paste fixes for whatever it can fix reliably (schema,
+   canonical tags, and broken-link flags so far — more finding types over
+   time).
 
 See **`audit-rubric.md`** for the full scoring methodology this is built
 on. No client/prospect data lives in this repo — it's a template and a
@@ -67,7 +68,13 @@ python remediate.py --audit-json acme-audit.json \
   on-site presence), but genuine judgment calls (is this content
   actually good, does this business really have the reviews it claims)
   stay human on purpose.
-- `remediate.py` currently generates schema and canonical tag fixes.
+- `remediate.py` currently generates schema and canonical tag fixes, plus
+  a flagged entry per broken link. Broken links are a special case: the
+  script has no way to know what a dead link *should* point to, so
+  instead of a working replacement it generates a clearly-marked
+  placeholder comment (the broken href, the problem, and the two safe
+  manual options — fix the href or remove the link) — same
+  never-fabricate discipline as schema's phone/address placeholders.
   Title/meta description are deliberately NOT auto-generated — that's
   real marketing copy, not markup, and this tool has no business
   fabricating it for a site it doesn't represent. Everything else gets
