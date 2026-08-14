@@ -1,0 +1,5 @@
+requests
+beautifulsoup4
+
+# Optional, enables audit.py's raw-vs-rendered content check:
+# playwright  (then run: playwright install chromium)

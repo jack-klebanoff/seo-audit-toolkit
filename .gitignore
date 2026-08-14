@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# generated reports — real prospect/client data, never commit
+*-audit.md
+*-audit.json
+*-remediation.md
+remediation-plan.md
+audit-report.md
+preflight-report.md
+
+# real prospect/client input data
+prospect-urls.txt
+*-urls.txt
