@@ -146,11 +146,23 @@ def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, l
     address = input_nap.get("address")
 
     pages = audit_data.get("category_1", {}).get("pages", [])
+    site_level = audit_data.get("category_1", {}).get("site_level", [])
 
     schema_fixes = []
     canonical_fixes = []
     broken_link_fixes = []
     other_findings = []
+
+    # Site-level findings (currently just robots.txt) aren't attached to
+    # any single page, so the per-page loop below never sees them. Without
+    # this, a site-level Immediate finding (e.g. a robots.txt sitemap
+    # pointing at the wrong domain) would silently vanish from the plan
+    # entirely rather than landing in "Not yet automated" — found via the
+    # prospect-audit skill's smoke test against WePipe's own site.
+    for f in site_level:
+        if f["severity"] not in ("immediate", "needs_work"):
+            continue
+        other_findings.append({"severity": f["severity"], "label": f["label"], "url": "site-wide", "detail": f["detail"]})
 
     for page in pages:
         if page.get("fetch_error"):

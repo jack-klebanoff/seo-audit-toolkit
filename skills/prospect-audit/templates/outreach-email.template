@@ -1,0 +1,29 @@
+Subject: Quick technical check on {{BUSINESS_NAME}}'s site
+
+Hi {{CONTACT_NAME}},
+
+I ran a quick technical scan on {{BUSINESS_NAME}}'s site ({{PAGES_CHECKED}}
+page{{S}} checked) — it's scoring {{TECHNICAL_SCORE}}/10 on the technical
+fundamentals search engines and AI answer engines check first (schema,
+indexability, page speed basics). A full audit also covers local search
+signals and content depth — this is just the first third.
+
+The biggest recurring gap: {{TOP_ISSUE_PLAIN_LANGUAGE}}.
+
+{{OPTIONAL_SECOND_FINDING_PLAIN_LANGUAGE}}
+
+Happy to send the full breakdown if useful — no obligation either way.
+
+{{YOUR_NAME}}
+
+---
+Fill-in notes (delete before sending):
+- Every {{PLACEHOLDER}} must come from the actual audit report for this
+  business — never invented. TECHNICAL_SCORE and PAGES_CHECKED come
+  straight from the audit JSON/Markdown output.
+- TOP_ISSUE_PLAIN_LANGUAGE should explain what the finding means in
+  practice, not just repeat its technical label — e.g. not "missing
+  canonical tags" but "a few pages could confuse Google about which
+  version is the 'real' one, which can quietly hurt rankings."
+- This is a draft. A human reviews and sends it — this template does not
+  get auto-sent by anything.
