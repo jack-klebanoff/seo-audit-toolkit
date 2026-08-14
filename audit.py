@@ -57,7 +57,9 @@ CHECKS (Category 1 — Rendering & Technical Foundation):
     7. robots.txt validity — fetchable, and no leftover placeholder domain
        in its Sitemap: line
     8. Broken links — same-domain links found on each page, checked for
-       4xx/5xx
+       4xx/5xx. Retries once on a network-level failure (dropped
+       connection, timeout) before flagging — a live site's occasional
+       hiccup isn't the same as an actually-dead link.
 
 USAGE
     pip install requests beautifulsoup4
@@ -82,6 +84,7 @@ import datetime
 import json
 import re
 import sys
+import time
 from dataclasses import dataclass, field
 from urllib.parse import urljoin, urlparse
 
@@ -92,6 +95,13 @@ TIMEOUT = 15
 USER_AGENT = "FirstDribble-AuditBot/1.0 (+prospect SEO audit)"
 RENDER_GAP_THRESHOLD = 0.30  # rendered word count > raw word count by more than this % = flagged
 MAX_LINKS_CHECKED = 15  # cap per-page broken-link checks — be a polite crawler, not a hammer
+LINK_CHECK_RETRIES = 2  # a live site can drop one connection without being
+                         # actually broken — the prospect-audit skill's
+                         # smoke test against WePipe's own site flagged a
+                         # fine page (confirmed via a manual curl) off one
+                         # RemoteDisconnected. Only retries network-level
+                         # failures, not a real HTTP 4xx/5xx status.
+LINK_RETRY_DELAY_SECONDS = 1.0
 SHINGLE_SIZE = 5  # word n-gram size for cross-page content-similarity detection
 SIMILARITY_NOTABLE_THRESHOLD = 0.20  # below this, not worth mentioning in the report
 SIMILARITY_HIGH_THRESHOLD = 0.55  # above this, flag as likely-templated — spot-check it
@@ -503,6 +513,31 @@ def check_robots_txt(site_root: str) -> Finding:
     return Finding("robots.txt", PASS, "robots.txt fetchable and its Sitemap: line matches this domain")
 
 
+def _check_single_link(link: str) -> str | None:
+    """Returns None if the link resolves cleanly, else a problem
+    description. Retries only on a network-level failure (connection
+    dropped, timed out, etc.) — a real HTTP 4xx/5xx status is the
+    server's actual answer and retrying it won't change that, but a
+    dropped connection against a live site is often just a one-off
+    hiccup, not a genuinely broken link."""
+    last_error = None
+    for attempt in range(LINK_CHECK_RETRIES):
+        if attempt > 0:
+            time.sleep(LINK_RETRY_DELAY_SECONDS)
+        try:
+            resp = requests.head(link, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT, allow_redirects=True)
+            if resp.status_code >= 400:
+                # some servers mishandle HEAD — confirm with GET before flagging
+                resp = requests.get(link, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT, allow_redirects=True)
+            if resp.status_code >= 400:
+                return f"HTTP {resp.status_code}"
+            return None
+        except requests.RequestException as e:
+            last_error = str(e)
+            continue
+    return last_error
+
+
 def check_broken_links(html: str, page_url: str) -> tuple[list, int]:
     """Same-domain links only, capped at MAX_LINKS_CHECKED — polite, not a
     full crawl. Returns (list of (url, problem_description), count_checked)."""
@@ -527,15 +562,9 @@ def check_broken_links(html: str, page_url: str) -> tuple[list, int]:
 
     broken = []
     for link in candidates:
-        try:
-            resp = requests.head(link, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT, allow_redirects=True)
-            if resp.status_code >= 400:
-                # some servers mishandle HEAD — confirm with GET before flagging
-                resp = requests.get(link, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT, allow_redirects=True)
-            if resp.status_code >= 400:
-                broken.append((link, f"HTTP {resp.status_code}"))
-        except requests.RequestException as e:
-            broken.append((link, str(e)))
+        problem = _check_single_link(link)
+        if problem:
+            broken.append((link, problem))
 
     return broken, len(candidates)
 
