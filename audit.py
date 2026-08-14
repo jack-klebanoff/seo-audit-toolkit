@@ -991,6 +991,7 @@ def build_json_report(business_name: str, pages: list, robots_finding: Finding, 
                     "fetch_error": p.fetch_error,
                     "score": p.technical_score if not p.fetch_error else None,
                     "findings": [finding_dict(f) for f in p.findings],
+                    "broken_links": [{"url": u, "problem": problem} for u, problem in p.broken_links],
                 }
                 for p in pages
             ],

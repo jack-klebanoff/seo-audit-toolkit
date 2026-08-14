@@ -7,8 +7,14 @@ ready-to-use fixes for the Category 1 findings we can actually fix from an
 audit alone — real code snippets, not just "fix this" prose.
 
 SCOPE SO FAR: schema fixes (missing or generic-only LocalBusiness/Service
-schema) and canonical tag fixes — both purely mechanical, no content
-judgment involved. Title/meta description fixes are deliberately NOT
+schema), canonical tag fixes, and broken-link flags — all purely
+mechanical, no content judgment involved. Broken links are the one
+category where "fix" doesn't mean a working replacement: this script has
+no way to know what a dead link *should* point to, so it generates a
+clearly-marked placeholder comment (the broken href + the problem +
+the two safe options) instead of guessing a destination — same
+never-fabricate discipline as schema's phone/address placeholders.
+Title/meta description fixes are deliberately NOT
 automated here: unlike a canonical URL, good title/meta copy requires
 knowing the actual business well enough to write for it, which this script
 has no business fabricating for a site it doesn't represent — same line
@@ -33,15 +39,21 @@ USAGE
 INPUT
     An audit.json produced by `audit.py --json-out`. If that run was given
     --phone/--address, this script reads them back automatically from the
-    JSON's `input_nap` field — no need to pass them again.
+    JSON's `input_nap` field — no need to pass them again. Per-link broken
+    link data (the `broken_links` field on each page) requires an audit.json
+    from a current audit.py — older reports without it still work, they just
+    fall back to a single summarized "Broken links" entry in "Not yet
+    automated" instead of one flagged entry per dead link.
 
 OUTPUT
     A Markdown remediation plan: one ready-to-paste JSON-LD block per page
     that needs one (with any placeholder values it had to use flagged
-    explicitly, same discipline as WePipe's own schema build), plus a
-    flagged list of every other Category 1 problem found — ordered
-    Immediate first (stop-the-bleeding), then Needs Work, per
-    /wiki/audit-rubric.md's Priorities framing.
+    explicitly, same discipline as WePipe's own schema build), one flagged
+    comment block per broken link found (href + problem + the two safe
+    manual options — never a guessed destination), plus a flagged list of
+    every other Category 1 problem found — ordered Immediate first
+    (stop-the-bleeding), then Needs Work, per /wiki/audit-rubric.md's
+    Priorities framing.
 """
 
 import argparse
@@ -109,7 +121,25 @@ def generate_canonical_snippet(page_url: str) -> str:
     return f'<link rel="canonical" href="{page_url}" />'
 
 
-def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, list, list, list]:
+def generate_broken_link_snippet(source_page_url: str, broken_url: str, problem: str) -> str:
+    """Never guesses a replacement destination — an audit alone can't tell
+    you what a dead link was supposed to point to. Produces a flagged
+    comment naming the exact href and problem, plus the two safe manual
+    options, same placeholder-flagging discipline as schema's phone/
+    address fields. Meant to be dropped in next to the real <a> tag as a
+    marker while someone decides which option applies."""
+    return (
+        f"<!-- BROKEN LINK found on {source_page_url}\n"
+        f'     href="{broken_url}" — {problem}\n'
+        f"     This script can't know the correct destination. Either:\n"
+        f"       1) update the href to the correct page, or\n"
+        f"       2) remove the link (and its surrounding <a> tag) if the\n"
+        f"          content it pointed to no longer exists.\n"
+        f"-->"
+    )
+
+
+def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, list, list, list, list]:
     business_name = audit_data.get("business_name", "Unknown Business")
     input_nap = audit_data.get("input_nap") or {}
     phone = input_nap.get("phone")
@@ -119,12 +149,23 @@ def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, l
 
     schema_fixes = []
     canonical_fixes = []
+    broken_link_fixes = []
     other_findings = []
 
     for page in pages:
         if page.get("fetch_error"):
             continue
         url = page["url"]
+        page_broken_links = page.get("broken_links", [])
+
+        for link in page_broken_links:
+            broken_link_fixes.append({
+                "page_url": url,
+                "broken_url": link["url"],
+                "problem": link["problem"],
+                "snippet": generate_broken_link_snippet(url, link["url"], link["problem"]),
+            })
+
         for f in page.get("findings", []):
             if f["severity"] not in ("immediate", "needs_work"):
                 continue
@@ -142,19 +183,22 @@ def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, l
                     "snippet": generate_canonical_snippet(url),
                     "original_finding": f["detail"],
                 })
+            elif f["label"] == "Broken links" and page_broken_links:
+                continue  # already captured above from structured per-link data
             else:
                 other_findings.append({"severity": f["severity"], "label": f["label"], "url": url, "detail": f["detail"]})
 
     other_findings.sort(key=lambda x: 0 if x["severity"] == "immediate" else 1)
-    return business_name, schema_fixes, canonical_fixes, other_findings
+    return business_name, schema_fixes, canonical_fixes, broken_link_fixes, other_findings
 
 
-def render_markdown(business_name: str, schema_fixes: list, canonical_fixes: list, other_findings: list, business_type: str) -> str:
+def render_markdown(business_name: str, schema_fixes: list, canonical_fixes: list, broken_link_fixes: list, other_findings: list, business_type: str) -> str:
     lines = [
         f"# Remediation Plan — {business_name}",
         "",
         f"**Schema fixes generated:** {len(schema_fixes)}",
         f"**Canonical tag fixes generated:** {len(canonical_fixes)}",
+        f"**Broken links flagged:** {len(broken_link_fixes)}",
         f"**Other Category 1 findings flagged (not yet auto-fixed):** {len(other_findings)}",
         "",
         "---",
@@ -215,6 +259,33 @@ def render_markdown(business_name: str, schema_fixes: list, canonical_fixes: lis
 
     lines.append("---")
     lines.append("")
+    lines.append("## Broken links")
+    lines.append("")
+
+    if broken_link_fixes:
+        lines.append(
+            "This script can't know what a dead link was supposed to point "
+            "to — each entry below flags exactly what's broken and the two "
+            "safe options (fix the href or remove the link), not a guessed "
+            "replacement URL."
+        )
+        lines.append("")
+        for fix in broken_link_fixes:
+            lines.append(f"### {fix['broken_url']}")
+            lines.append("")
+            lines.append(f"**Found on:** {fix['page_url']}  ")
+            lines.append(f"**Problem:** {fix['problem']}")
+            lines.append("")
+            lines.append("```html")
+            lines.append(fix["snippet"])
+            lines.append("```")
+            lines.append("")
+    else:
+        lines.append("None found — no broken same-domain links detected.")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
     lines.append("## Not yet automated")
     lines.append("")
     lines.append(
@@ -248,8 +319,8 @@ def main():
     with open(args.audit_json, "r", encoding="utf-8") as f:
         audit_data = json.load(f)
 
-    business_name, schema_fixes, canonical_fixes, other_findings = build_remediation_plan(audit_data, args.business_type)
-    report = render_markdown(business_name, schema_fixes, canonical_fixes, other_findings, args.business_type)
+    business_name, schema_fixes, canonical_fixes, broken_link_fixes, other_findings = build_remediation_plan(audit_data, args.business_type)
+    report = render_markdown(business_name, schema_fixes, canonical_fixes, broken_link_fixes, other_findings, args.business_type)
 
     with open(args.out, "w", encoding="utf-8") as f:
         f.write(report)
@@ -257,6 +328,7 @@ def main():
     print(f"Business: {business_name}")
     print(f"Schema fixes generated: {len(schema_fixes)}")
     print(f"Canonical tag fixes generated: {len(canonical_fixes)}")
+    print(f"Broken links flagged: {len(broken_link_fixes)}")
     print(f"Other Category 1 findings flagged: {len(other_findings)}")
     print(f"Remediation plan written to {args.out}")
 
