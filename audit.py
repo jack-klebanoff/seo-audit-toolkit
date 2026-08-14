@@ -92,7 +92,7 @@ import requests
 from bs4 import BeautifulSoup
 
 TIMEOUT = 15
-USER_AGENT = "FirstDribble-AuditBot/1.0 (+prospect SEO audit)"
+USER_AGENT = "Junefruit-AuditBot/1.0 (+prospect SEO audit)"
 RENDER_GAP_THRESHOLD = 0.30  # rendered word count > raw word count by more than this % = flagged
 MAX_LINKS_CHECKED = 15  # cap per-page broken-link checks — be a polite crawler, not a hammer
 LINK_CHECK_RETRIES = 2  # a live site can drop one connection without being
