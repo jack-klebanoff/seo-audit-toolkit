@@ -8,9 +8,11 @@ venv/
 *-audit.md
 *-audit.json
 *-remediation.md
+*-diff.md
 remediation-plan.md
 audit-report.md
 preflight-report.md
+maintenance-diff.md
 
 # real prospect/client input data
 prospect-urls.txt

@@ -33,7 +33,7 @@ Then it's available in Claude Code on your machine as `/<skill-name>`.
 |---|---|
 | [`briefing`](briefing/SKILL.md) | Plain-language status narrative — before starting work (oriented) or wrapping up (recap). Not a file dump; a human-readable briefing. Built 2026-08-13 during the WePipe project. |
 | [`client-onboarding`](client-onboarding/SKILL.md) | Scaffold a new client project — repo, CLAUDE.md + wiki (genericized from WePipe's real, proven version), an access checklist, and a scope-of-work doc. Use for every new client, including friends/family handoffs — don't skip the checklist/scope docs just because it's informal. Built 2026-08-13. |
-| [`prospect-audit`](prospect-audit/SKILL.md) | Run `audit.py` then `remediate.py` then draft an outreach email, as one process instead of chaining the two scripts by hand. Use for cold-outreach on a new prospect/lead. Built 2026-08-14. |
+| [`prospect-audit`](prospect-audit/SKILL.md) | Run `audit.py` then `remediate.py` then draft an outreach email and/or cold-call script, as one process instead of chaining the two scripts by hand. Use for cold-outreach on a new prospect/lead. Built 2026-08-14. |
 
 ## Editing a skill
 

@@ -1,17 +1,19 @@
 ---
 name: prospect-audit
-description: Run a complete cold-outreach SEO audit on a prospect's website — audit.py, then remediate.py, then a drafted outreach message — as one process instead of chaining the two scripts by hand each time. Use when starting outreach on a new prospect/lead, or asked to "audit this site," "run the toolkit on X," or "check out a prospect."
+description: Run a complete cold-outreach SEO audit on a prospect's website — audit.py, then remediate.py, then a drafted outreach email and/or cold-call script — as one process instead of chaining the two scripts by hand each time. Use when starting outreach on a new prospect/lead, or asked to "audit this site," "run the toolkit on X," "check out a prospect," or "give me something to say on a call."
 ---
 
 # Prospect Audit
 
 Turns the two standalone scripts in this repo (`audit.py`, `remediate.py`)
 into one repeatable process with a deliverable at the end: a scored
-report, a remediation plan, and a draft outreach message — not just two
-files sitting in a folder. Built 2026-08-14, after `remediate.py` reached
-schema + canonical + broken-link coverage, because the scripts themselves
-were solid but running them was still a manual, easy-to-forget-a-flag
-routine.
+report, a remediation plan, and a draft outreach email and/or cold-call
+script — not just two files sitting in a folder. Built 2026-08-14, after
+`remediate.py` reached schema + canonical + broken-link coverage, because
+the scripts themselves were solid but running them was still a manual,
+easy-to-forget-a-flag routine. The cold-call script was added the same
+day, once it became clear phone outreach needed the same "never overclaim
+beyond what the audit found" discipline as the email.
 
 ## Where the scripts live
 
@@ -75,14 +77,25 @@ isn't already known from context, ask, don't assume
    Report back the counts (schema fixes / canonical fixes / broken
    links flagged / other findings) the script itself prints.
 
-6. **Draft the outreach message** — don't just point at the files, write
-   something sendable. Start from the `cold_outreach_snippet` field
-   already in the audit JSON (Category 1 only, deliberately worded not
-   to overclaim) and expand it into a short email using
-   `templates/outreach-email.template`. Fill in the real score and the
-   real top issue from steps 4-5 — never invent a finding that isn't in
-   the report, never state a specific number (score, page count) that
-   isn't the one the tool actually produced.
+6. **Draft the outreach** — don't just point at the files, write
+   something usable. Ask whether the user wants an email, a cold-call
+   script, or both (default to email if they don't say — it's the
+   lower-friction ask). Either way, start from the same source: the
+   `cold_outreach_snippet` field already in the audit JSON (Category 1
+   only, deliberately worded not to overclaim), plus the real score and
+   real top issue surfaced in steps 4-5.
+   - Email: expand into a short, sendable message using
+     `templates/outreach-email.template`.
+   - Cold-call script: fill in `templates/cold-call-script.template` —
+     it's a talk-through guide with an opener, the hook, common
+     objections, a voicemail branch, and a close, not a word-for-word
+     read. The only goal of the call is a confirmed email address to
+     send the real report to, not a sale on the phone — the script is
+     built around that, don't rewrite it into a harder pitch.
+   - Either format: never invent a finding that isn't in the report,
+     never state a specific number (score, page count) that isn't the
+     one the tool actually produced, never fabricate urgency or a
+     competitor comparison the audit didn't actually surface.
 
 7. **Remind, don't gate:** Category 2 (Local Signals) and Category 3
    (Content, Trust & Depth) are still blank manual checklists in the
@@ -106,13 +119,16 @@ isn't already known from context, ask, don't assume
   finding that isn't literally in the audit's own output — same
   never-fabricate discipline `remediate.py` follows for schema
   placeholders and broken-link comments.
-- Never auto-send the outreach draft. This produces a draft for the
-  human to review and send themselves, same as `remediate.py`'s output
-  is something a human pastes in, not something this tooling publishes.
-- Don't overclaim in the outreach draft beyond what Category 1 alone
-  supports — the tool's own snippet is worded that way on purpose (see
-  `generate_outreach_snippet` in `audit.py`); don't "improve" it into a
-  stronger claim the data doesn't back.
+- Never auto-send the outreach draft, and never make or dial a call.
+  This produces material for the human to use themselves — same as
+  `remediate.py`'s output is something a human pastes in, not something
+  this tooling publishes or acts on.
+- Don't overclaim in the outreach draft (email or call script) beyond
+  what Category 1 alone supports — the tool's own snippet is worded
+  that way on purpose (see `generate_outreach_snippet` in `audit.py`);
+  don't "improve" it into a stronger claim the data doesn't back. This
+  goes double for the call script's objection-handling lines — don't
+  turn them into harder-sell pitches than what's drafted.
 - Don't skip step 4 (surfacing findings in chat) just because the files
   exist — a folder of reports nobody read isn't the deliverable this
   skill exists to produce.
