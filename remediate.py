@@ -6,13 +6,17 @@ Companion to audit.py: takes an audit's JSON output and generates concrete,
 ready-to-use fixes for the Category 1 findings we can actually fix from an
 audit alone — real code snippets, not just "fix this" prose.
 
-SCOPE OF THIS FIRST VERSION: schema fixes only (missing or generic-only
-LocalBusiness/Service schema — the most common finding in practice, and the
-one with the clearest, most reliable fix). Every other NEEDS_WORK/IMMEDIATE
-Category 1 finding is listed as a flagged action item, not yet auto-fixed —
-see the "Not yet automated" section of the output. More finding types get
-real fixes in later passes, one at a time, same discipline audit.py's own
-three features were built and verified with.
+SCOPE SO FAR: schema fixes (missing or generic-only LocalBusiness/Service
+schema) and canonical tag fixes — both purely mechanical, no content
+judgment involved. Title/meta description fixes are deliberately NOT
+automated here: unlike a canonical URL, good title/meta copy requires
+knowing the actual business well enough to write for it, which this script
+has no business fabricating for a site it doesn't represent — same line
+drawn around testimonials elsewhere in this project. Every other
+NEEDS_WORK/IMMEDIATE Category 1 finding is listed as a flagged action item
+in the "Not yet automated" section. More finding types get real fixes in
+later passes, one at a time, same discipline audit.py's own features were
+built and verified with.
 
 WHO THIS IS FOR: sites we do NOT have repo access to — a sales prospect, a
 site on an unknown CMS. The output is something a human pastes in; this
@@ -96,7 +100,16 @@ def generate_schema_snippet(business_name: str, page_url: str, business_type: st
     return html_snippet, placeholders
 
 
-def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, list, list]:
+def generate_canonical_snippet(page_url: str) -> str:
+    """Always correct, no judgment call involved — the canonical URL for
+    a page is just that page's own URL. Unlike schema (which needs real
+    business info) or title/meta (which needs real marketing copy this
+    script has no business fabricating), this fix type is purely
+    mechanical, so it always gets generated with zero placeholders."""
+    return f'<link rel="canonical" href="{page_url}" />'
+
+
+def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, list, list, list]:
     business_name = audit_data.get("business_name", "Unknown Business")
     input_nap = audit_data.get("input_nap") or {}
     phone = input_nap.get("phone")
@@ -105,6 +118,7 @@ def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, l
     pages = audit_data.get("category_1", {}).get("pages", [])
 
     schema_fixes = []
+    canonical_fixes = []
     other_findings = []
 
     for page in pages:
@@ -122,18 +136,25 @@ def build_remediation_plan(audit_data: dict, business_type: str) -> tuple[str, l
                     "placeholders": placeholders,
                     "original_finding": f["detail"],
                 })
+            elif f["label"] == "Canonical tag":
+                canonical_fixes.append({
+                    "url": url,
+                    "snippet": generate_canonical_snippet(url),
+                    "original_finding": f["detail"],
+                })
             else:
                 other_findings.append({"severity": f["severity"], "label": f["label"], "url": url, "detail": f["detail"]})
 
     other_findings.sort(key=lambda x: 0 if x["severity"] == "immediate" else 1)
-    return business_name, schema_fixes, other_findings
+    return business_name, schema_fixes, canonical_fixes, other_findings
 
 
-def render_markdown(business_name: str, schema_fixes: list, other_findings: list, business_type: str) -> str:
+def render_markdown(business_name: str, schema_fixes: list, canonical_fixes: list, other_findings: list, business_type: str) -> str:
     lines = [
         f"# Remediation Plan — {business_name}",
         "",
         f"**Schema fixes generated:** {len(schema_fixes)}",
+        f"**Canonical tag fixes generated:** {len(canonical_fixes)}",
         f"**Other Category 1 findings flagged (not yet auto-fixed):** {len(other_findings)}",
         "",
         "---",
@@ -166,6 +187,30 @@ def render_markdown(business_name: str, schema_fixes: list, other_findings: list
             lines.append("")
     else:
         lines.append("None needed — every page already had valid business-type schema.")
+        lines.append("")
+
+    lines.append("---")
+    lines.append("")
+    lines.append("## Canonical tag fixes")
+    lines.append("")
+
+    if canonical_fixes:
+        lines.append(
+            "Always the page's own URL — no judgment call involved, so these "
+            "carry no placeholders to verify. Add inside `<head>`."
+        )
+        lines.append("")
+        for fix in canonical_fixes:
+            lines.append(f"### {fix['url']}")
+            lines.append("")
+            lines.append(f"**Original finding:** {fix['original_finding']}")
+            lines.append("")
+            lines.append("```html")
+            lines.append(fix["snippet"])
+            lines.append("```")
+            lines.append("")
+    else:
+        lines.append("None needed — every page already had a canonical tag.")
         lines.append("")
 
     lines.append("---")
@@ -203,14 +248,15 @@ def main():
     with open(args.audit_json, "r", encoding="utf-8") as f:
         audit_data = json.load(f)
 
-    business_name, schema_fixes, other_findings = build_remediation_plan(audit_data, args.business_type)
-    report = render_markdown(business_name, schema_fixes, other_findings, args.business_type)
+    business_name, schema_fixes, canonical_fixes, other_findings = build_remediation_plan(audit_data, args.business_type)
+    report = render_markdown(business_name, schema_fixes, canonical_fixes, other_findings, args.business_type)
 
     with open(args.out, "w", encoding="utf-8") as f:
         f.write(report)
 
     print(f"Business: {business_name}")
     print(f"Schema fixes generated: {len(schema_fixes)}")
+    print(f"Canonical tag fixes generated: {len(canonical_fixes)}")
     print(f"Other Category 1 findings flagged: {len(other_findings)}")
     print(f"Remediation plan written to {args.out}")
 
