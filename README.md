@@ -8,12 +8,17 @@ A reusable, client-agnostic toolkit for two jobs:
    and ongoing QA on sites we've already built.
 2. **`remediate.py`** — takes an `audit.py` JSON report and generates
    concrete, ready-to-paste fixes for whatever it can fix reliably (schema
-   so far — more finding types over time).
+   and canonical tags so far — more finding types over time).
 
 See **`audit-rubric.md`** for the full scoring methodology this is built
 on. No client/prospect data lives in this repo — it's a template and a
 pair of scripts, meant to be pointed at whichever site you're working on
 that day.
+
+This repo has grown into the general home for reusable, cross-client
+tooling — see **[`skills/`](skills/README.md)** for reusable Claude Code
+Skills/processes (not just SEO-audit-specific ones), backed up here so
+they're not stranded on one machine.
 
 ## Setup
 
@@ -62,8 +67,11 @@ python remediate.py --audit-json acme-audit.json \
   on-site presence), but genuine judgment calls (is this content
   actually good, does this business really have the reviews it claims)
   stay human on purpose.
-- `remediate.py` currently only generates schema fixes. Everything else
-  gets flagged as a prioritized action item, not silently skipped.
+- `remediate.py` currently generates schema and canonical tag fixes.
+  Title/meta description are deliberately NOT auto-generated — that's
+  real marketing copy, not markup, and this tool has no business
+  fabricating it for a site it doesn't represent. Everything else gets
+  flagged as a prioritized action item, not silently skipped.
 - Neither script can touch Google Business Profile, review counts, or
   map-pack rankings — those need real Google API access this toolkit
   doesn't have, or in GBP's case, actual business-owner verification no
