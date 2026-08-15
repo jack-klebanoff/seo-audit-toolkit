@@ -1,5 +1,6 @@
 requests
 beautifulsoup4
+lxml  # required by wave_qa.py's sitemap XML parsing (BeautifulSoup's "xml" feature)
 
 # Optional, enables audit.py's raw-vs-rendered content check:
 # playwright  (then run: playwright install chromium)

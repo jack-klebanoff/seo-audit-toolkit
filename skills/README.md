@@ -33,7 +33,9 @@ Then it's available in Claude Code on your machine as `/<skill-name>`.
 |---|---|
 | [`briefing`](briefing/SKILL.md) | Plain-language status narrative — before starting work (oriented) or wrapping up (recap). Not a file dump; a human-readable briefing. Built 2026-08-13 during the WePipe project. |
 | [`client-onboarding`](client-onboarding/SKILL.md) | Scaffold a new client project — repo, CLAUDE.md + wiki, an internal access checklist, a scope-of-work doc, and a client-facing onboarding kit (a "what we do" one-pager, a plain-language access walkthrough, and a draft protection agreement). Use for every new client, including friends/family handoffs. Built 2026-08-13, onboarding kit added 2026-08-14. |
-| [`prospect-audit`](prospect-audit/SKILL.md) | Run `audit.py` then `remediate.py` then draft an outreach email and/or cold-call script, as one process instead of chaining the two scripts by hand. Use for cold-outreach on a new prospect/lead. Built 2026-08-14. |
+| [`prospect-audit`](prospect-audit/SKILL.md) | Run `audit.py` then `remediate.py` then draft an outreach email and/or cold-call script, then log the lead in `junefruit-hq`'s pipeline tracker, as one process instead of chaining it all by hand. Use for cold-outreach on a new prospect/lead. Built 2026-08-14. |
+| [`site-maintenance`](site-maintenance/SKILL.md) | Recurring health check on an *already-live* client — re-audit, diff against the last check, flag stale content, log to that client's own wiki. Never for prospects. Built 2026-08-14. |
+| [`wave-qa`](wave-qa/SKILL.md) | Verify a bulk page launch ("wave") against six hard gates (HTTP status, schema, sitemap, hub-linking, meta uniqueness, duplicate content) before it ships. Promoted from WePipe's own `post-wave-qa.py`. Built 2026-08-14. |
 
 ## Editing a skill
 
