@@ -200,7 +200,19 @@ def extract_body_text(html: str) -> str:
 
 
 def similarity(a: str, b: str) -> float:
-    return difflib.SequenceMatcher(None, a, b).ratio()
+    """autojunk=False is required here, not optional: SequenceMatcher's
+    default autojunk=True treats any character appearing in >1% of a
+    string over ~200 chars as "popular junk" and excludes it from
+    matching -- for real page-body prose (not the diff-tool
+    line-comparison case autojunk was designed for), this silently
+    deflates scores badly. Found 2026-08-15 while building
+    site_coverage_index.py and testing it against a real positive case:
+    two 211-char near-identical strings scored 0.68 with the default,
+    0.995 with autojunk=False. This means DUPLICATE_SIMILARITY_THRESHOLD
+    (0.85) has likely been under-detecting real duplicate content in
+    every wave_qa.py run before this fix -- the threshold itself hasn't
+    been re-validated against real data with the corrected metric yet."""
+    return difflib.SequenceMatcher(None, a, b, autojunk=False).ratio()
 
 
 # --------------------------------------------------------------------------
