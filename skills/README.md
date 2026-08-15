@@ -37,6 +37,7 @@ Then it's available in Claude Code on your machine as `/<skill-name>`.
 | [`site-maintenance`](site-maintenance/SKILL.md) | Recurring health check on an *already-live* client — re-audit, diff against the last check, flag stale content, log to that client's own wiki. Never for prospects. Built 2026-08-14. |
 | [`wave-qa`](wave-qa/SKILL.md) | Verify a bulk page launch ("wave") against six hard gates (HTTP status, schema, sitemap, hub-linking, meta uniqueness, duplicate content) before it ships, plus a content-bar structure check for area/town pages (`content_bar_check.py` — entity count, FAQ structure, narrative length; verified against synthetic data only so far). Promoted from WePipe's own `post-wave-qa.py`. Built 2026-08-14. |
 | [`content-qc`](content-qc/SKILL.md) | Checks whether generated content stays faithful to its own declared `sourceFacts`, or invents specific-sounding claims with no real backing — advisory fabrication/grounding review, not a hard gate. Validated against constructed test cases (catches planted fabrication, no false positives on clean paraphrasing) but not proven at production scale. Built 2026-08-14. |
+| [`juney-wake-up`](juney-wake-up/SKILL.md) | The "Juney wake up" morning-startup phrase — reads HQ + all active clients' state, runs a real live check (not just old notes) via `site-maintenance`, delivers it through `briefing`. GBP/GA4/live-tracking explicitly stubbed as "not yet" on purpose. Built 2026-08-15. |
 
 ## Editing a skill
 
