@@ -1,6 +1,6 @@
 ---
 name: prospect-audit
-description: Run a complete cold-outreach SEO audit on a prospect's website — audit.py, then remediate.py, then a drafted outreach email and/or cold-call script — as one process instead of chaining the two scripts by hand each time. Use when starting outreach on a new prospect/lead, or asked to "audit this site," "run the toolkit on X," "check out a prospect," or "give me something to say on a call."
+description: Run a complete cold-outreach SEO audit on a prospect's website — audit.py, then remediate.py, then a drafted outreach email and/or cold-call script, then logging the lead in junefruit-hq's pipeline tracker — as one process instead of chaining it all by hand each time. Use when starting outreach on a new prospect/lead, or asked to "audit this site," "run the toolkit on X," "check out a prospect," or "give me something to say on a call."
 ---
 
 # Prospect Audit
@@ -113,6 +113,19 @@ isn't already known from context, ask, don't assume
    asked to commit or push, stop and flag that this would break that
    rule rather than doing it.
 
+9. **Log the lead in the pipeline.** This is what turns a one-off audit
+   into a tracked sales process. Find `junefruit-hq`'s `wiki/leads.md`
+   (ask for the location if it's not already known from context — don't
+   assume a path). Add a new row (or update an existing one if this
+   business was already in the pipeline) with the real business name,
+   contact info if known, source, status **Audited**, the real Category
+   1 score, today's date, and a next action (e.g. "send outreach
+   email"). This file is meant to be tracked in git and holds real
+   contact info — unlike this repo's gitignored prospect data, don't
+   avoid committing it there; that's `junefruit-hq`'s own convention to
+   follow (private repo once it has a remote — see that file's own
+   sensitivity note).
+
 ## What NOT to do
 
 - Never fabricate a phone number, address, business type, or specific
@@ -133,3 +146,6 @@ isn't already known from context, ask, don't assume
   exist — a folder of reports nobody read isn't the deliverable this
   skill exists to produce.
 - Don't commit or push the generated prospect files — see step 8.
+- Don't skip step 9 — an audit that never makes it into `wiki/leads.md`
+  is invisible to the pipeline, which defeats the point of tracking it
+  at all.
