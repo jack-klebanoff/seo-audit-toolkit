@@ -40,8 +40,16 @@ original documented schema verbatim):
         {"q": "...", "a": "...", "role": "town-specific"},
         ...
       ],
-      "nearbyAreas": ["adjacent-town-1", "adjacent-town-2"]
+      "nearbyAreas": ["adjacent-town-1", "adjacent-town-2"],
+      "sourceFacts": ["Short, specific, human-verified factual statement", ...]
     }
+
+NOTE on "sourceFacts": not used by THIS script -- it's read by the
+separate `content-qc` skill (Layer 2: does the prose actually stay
+faithful to real, human-provided facts, or does it invent additional
+specific-sounding claims). Documented here anyway so the two layers
+share one schema instead of drifting into two different JSON shapes for
+the same page.
 
 ADDITIONS, why they exist:
     - *Entities fields: the "15+ named local entities" rule can't be
