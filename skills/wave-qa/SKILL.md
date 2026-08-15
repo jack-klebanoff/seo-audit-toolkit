@@ -1,6 +1,6 @@
 ---
 name: wave-qa
-description: Verify a batch of newly-launched pages (a "wave") meets the six hard-gate standard before it ships — HTTP status, schema, sitemap inclusion, hub linking, meta uniqueness, cross-page duplicate content. Use after a bulk page launch (the area-page fan-out from Module 9/10), or when asked to "check this wave," "run wave QA," or "is this batch ready to ship."
+description: Verify a batch of newly-launched pages (a "wave") meets the six hard-gate standard before it ships — HTTP status, schema, sitemap inclusion, hub linking, meta uniqueness, cross-page duplicate content — plus, for area/town pages, a content-bar structure check (entity count, FAQ structure, narrative length) before publish. Use after a bulk page launch (the area-page fan-out from Module 9/10), or when asked to "check this wave," "run wave QA," or "is this batch ready to ship."
 ---
 
 # Wave QA
@@ -39,11 +39,32 @@ machine isn't already known from context, ask — don't assume
    If any of these is unclear, ask — don't assume a URL pattern from
    the client's other pages.
 
-2. **Run the check:**
+2. **Run the technical check:**
    ```
    python wave_qa.py --urls wave-urls.txt --sitemap <sitemap> \
        --hubs hub-urls.txt --out wave-qa-report.md
    ```
+
+2b. **If this wave is area/town pages built from structured data**
+   (the Module 9 schema — slug/name/introParagraph1/introParagraph2/
+   faqs/nearbyAreas), also run `content_bar_check.py` against that data
+   *before* publishing, not after:
+   ```
+   python content_bar_check.py --data town-pages.json \
+       --out content-bar-report.md [--trust-claim "<exact phrase, if finalized>"]
+   ```
+   This checks a different layer than `wave_qa.py` — not the live
+   published pages, but the underlying content structure: named-entity
+   count (verified against what's actually declared and used, not just
+   claimed), narrative length floor, the 4-evergreen-then-town-specific
+   FAQ structure, and the trust-claim phrase if one's been finalized.
+   **Status as of 2026-08-14: built and verified against synthetic
+   data only** — no client has real content in this schema yet, so this
+   hasn't been proven against a real wave. Say that plainly if it's the
+   first real run, don't imply it's been battle-tested when it hasn't.
+   This checks structure only, not whether the content is actually
+   *good* — see junefruit-hq/CLAUDE.md Section 7's content-QC gap for
+   the still-unsolved judgment layer.
 
 3. **Surface the real result in chat, not just the exit code.** Report
    the pass/fail count, and for any failure, which of the six checks
@@ -79,3 +100,8 @@ machine isn't already known from context, ask — don't assume
   same reasoning as `site-maintenance`.
 - Don't silently skip re-verification after a fix (see step 5) — a
   partial re-check can miss a check that regressed from the fix itself.
+- Don't present `content_bar_check.py` (step 2b) as proven — as of
+  2026-08-14 it's verified against synthetic data only, no real wave has
+  gone through it yet. And it checks *structure*, not whether the
+  content is genuinely accurate/locally-specific — never imply a clean
+  content-bar run means the content is actually good.
