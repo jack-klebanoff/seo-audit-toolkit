@@ -1,6 +1,6 @@
 ---
 name: client-onboarding
-description: Scaffold a new client project — repo, project-brain (CLAUDE.md + wiki), access checklist, and a simple scope-of-work doc. Use when taking on a new client (including friends/family handing over an existing site), so every client gets the same proven discipline instead of starting from scratch each time.
+description: Scaffold a new client project — repo, project-brain (CLAUDE.md + wiki), an internal access checklist, a scope-of-work doc, and a client-facing onboarding kit (intro one-pager, plain-language access walkthrough, draft protection agreement). Use when taking on a new client (including friends/family handing over an existing site), so every client gets the same proven discipline instead of starting from scratch each time.
 ---
 
 # Client Onboarding
@@ -42,20 +42,39 @@ without rebuilding it from memory each time.
    the reference format) and **`lessons.json`** with the empty
    `{"lessons": []}` shell.
 
-5. **Generate the access checklist** from
-   `templates/ACCESS-CHECKLIST.md` — this becomes something to actually
-   send the client (or walk through with them if it's a friend/family
-   handoff). Don't skip this even for friends/family — access logistics
-   were the single biggest source of friction/delay on WePipe (GBP
-   verification stuck for weeks, DNS not cut over, GA4/GSC access not
-   in hand) and that gets *worse*, not better, in an informal handoff
-   where nobody wrote down what's needed.
+5. **Generate the internal access checklist** from
+   `templates/ACCESS-CHECKLIST.md` — this is for *us*, to track what's
+   been sorted and what's still open. It is not client-facing (too much
+   internal framing/jargon) — see step 5b for what actually goes to the
+   client.
+
+5b. **Generate the client-facing onboarding kit** — three documents,
+   meant to actually be sent, not just exist:
+   - `templates/WHAT-WE-DO.md` — a short, plain-language intro: who
+     Junefruit is, the two service tracks (refresh existing site vs.
+     full rebuild), what the client can expect from us.
+   - `templates/ACCESS-WALKTHROUGH.md` — step-by-step, client-facing
+     (not the internal checklist from step 5) instructions for GBP,
+     GA4, GSC, and domain/DNS access. Plain language, no jargon, real
+     click-paths. Fill in `{{YOUR_TEAM_EMAIL}}` with the real address
+     access requests should go to before sending.
+   - `templates/CLIENT-PROTECTION-AGREEMENT.md` — plain-language terms
+     covering what we commit to (won't touch what's working without
+     sign-off, never fabricate content, access not ownership, which
+     service track applies). **This one carries a permanent warning
+     that it's a draft, not a finished legal document** — never remove
+     that warning, and always tell the user it needs an actual
+     attorney's review before anyone signs it, even if they seem eager
+     to skip that step.
 
 6. **Generate a scope-of-work doc** from
    `templates/SCOPE-OF-WORK.md` — even for a free/discounted
    friends-and-family job, get *something* in writing: what's being
    done, rough timeline, who owns what. This is what prevents scope
-   creep and protects the relationship, not a formality.
+   creep and protects the relationship, not a formality. This is a
+   different document from the Client Protection Agreement (step 5b) —
+   that one covers trust/access, this one covers deliverables/timeline/
+   cost. Both matter; don't treat one as covering the other.
 
 7. **If they already have a live site** (handoff scenario, not a
    fresh build): recommend running `audit.py` (from this repo) against
@@ -74,6 +93,11 @@ without rebuilding it from memory each time.
 - Don't copy WePipe's actual business specifics (We Pipe LLC's real
   phone/address/roles) into a new client's files — those templates have
   the real content stripped to placeholders on purpose.
+- Never strip or soften the legal-review warning at the top of
+  `CLIENT-PROTECTION-AGREEMENT.md`, and never tell a user it's ready to
+  sign as-is. A confident-sounding draft with a real gap in it (missed
+  liability, IP, or termination language) is worse than no document at
+  all — that warning is what keeps this template from becoming that.
 
 ## Stack default
 
