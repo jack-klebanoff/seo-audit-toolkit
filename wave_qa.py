@@ -68,6 +68,14 @@ from bs4 import BeautifulSoup
 TIMEOUT = 15
 USER_AGENT = "Junefruit-QA-Bot/1.0 (+internal SEO wave QA script)"
 DUPLICATE_SIMILARITY_THRESHOLD = 0.85  # >= this ratio between two pages' body text = flagged as duplicate content
+# Re-validated 2026-08-15 against real WePipe content (4 Ridgewood service
+# pages), after fixing the autojunk similarity bug above. Even the worst
+# case -- comparing ONLY the intentionally-repeated parts (verbatim trust
+# claim, near-identical evergreen FAQ answers) -- topped out at 0.51.
+# Genuinely distinct real pages scored 0.30-0.47 including that repeated
+# content. Actual near-duplicate content (synthetic test) scored 0.995.
+# 0.85 sits in a wide gap between both, not a knife's edge -- but this is
+# one client, one town, four pages; re-check as more real content exists.
 
 
 # --------------------------------------------------------------------------

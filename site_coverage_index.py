@@ -68,6 +68,8 @@ if sys.stdout.encoding is None or sys.stdout.encoding.lower() != "utf-8":
     sys.stderr.reconfigure(encoding="utf-8")
 
 DUPLICATE_SIMILARITY_THRESHOLD = 0.85  # same threshold as wave_qa.py's live-page check, for consistency
+# Re-validated 2026-08-15 against real WePipe content -- see the matching
+# note in wave_qa.py for the actual numbers. Same threshold, same margin.
 
 
 @dataclass
