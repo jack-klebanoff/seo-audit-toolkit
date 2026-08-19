@@ -17,6 +17,8 @@ wave-qa-report.md
 content-bar-report.md
 page-ratio-report.md
 site-coverage-report.md
+*-cb.md
+*-recheck.md
 
 # real prospect/client input data
 prospect-urls.txt
